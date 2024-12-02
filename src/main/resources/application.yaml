@@ -1,1 +1,7 @@
-spring.application.name=EBANKING
+spring:
+  application:
+    name : E-BANKING
+
+  profiles:
+    default: dev
+    active:
