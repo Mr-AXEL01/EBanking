@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any  // Use any available agent
 
     stages {
         stage('Declarative: Checkout SCM') {
@@ -11,8 +11,7 @@ pipeline {
 
     post {
         always {
-            // Wrap your post-action inside the node block
-            node {
+            node {  // This will now work as Jenkins uses the default agent
                 archiveArtifacts artifacts: '**/*', allowEmptyArchive: true
             }
         }
