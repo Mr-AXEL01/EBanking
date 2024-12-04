@@ -2,6 +2,7 @@ package net.axel.ebanking.security.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.axel.ebanking.security.dtos.role.RoleRequestDTO;
 import net.axel.ebanking.security.dtos.user.UserRequestDTO;
 import net.axel.ebanking.security.dtos.user.UserResponseDTO;
 import net.axel.ebanking.security.service.UserService;
@@ -43,5 +44,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable("username") String username) {
         service.deleteUser(username);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{username}/updateRole")
+    public ResponseEntity<UserResponseDTO> updateRole(@PathVariable("username") String username,
+                                                      @RequestBody @Valid RoleRequestDTO dto) {
+        UserResponseDTO updatedUser = service.updateUserRole(username, dto);
+        return ResponseEntity.ok(updatedUser);
     }
 }
