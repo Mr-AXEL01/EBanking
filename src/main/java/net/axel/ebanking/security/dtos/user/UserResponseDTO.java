@@ -10,8 +10,6 @@ public record UserResponseDTO (
 
         @NotBlank String username,
 
-        @NotBlank String password,
-
         RoleEmbeddedDTO role
 ) {
 }
