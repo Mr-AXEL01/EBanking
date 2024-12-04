@@ -2,10 +2,14 @@ package net.axel.ebanking.security.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.axel.ebanking.exception.domain.BadCredentialsException;
+import net.axel.ebanking.exception.domain.BusinessException;
+import net.axel.ebanking.exception.domain.ResourceNotFoundException;
 import net.axel.ebanking.security.dtos.role.RoleRequestDTO;
 import net.axel.ebanking.security.dtos.role.RoleResponseDTO;
 import net.axel.ebanking.security.dtos.user.UserRequestDTO;
 import net.axel.ebanking.security.dtos.user.UserResponseDTO;
+import net.axel.ebanking.security.dtos.user.UserUpdatePasswordDTO;
 import net.axel.ebanking.security.entities.AppRole;
 import net.axel.ebanking.security.entities.AppUser;
 import net.axel.ebanking.security.mapper.RoleMapper;
@@ -13,6 +17,7 @@ import net.axel.ebanking.security.mapper.UserMapper;
 import net.axel.ebanking.security.repository.RoleRepository;
 import net.axel.ebanking.security.repository.UserRepository;
 import net.axel.ebanking.security.service.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -84,6 +89,25 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(mapper::toResponseDto)
                 .toList();
+    }
+
+    @Override
+    public UserResponseDTO updatePassword(UserUpdatePasswordDTO dto) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        AppUser user = repository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with the username provided :" + username));
+
+        if (!passwordEncoder.matches(dto.currentPassword(), user.password())) {
+            throw new BadCredentialsException("Current password is incorrect.");
+        }
+
+        if (passwordEncoder.matches(dto.newPassword(), user.password())) {
+            throw new BusinessException("The new password can't be the same as the current one.");
+        }
+
+        user.password(passwordEncoder.encode(dto.newPassword()));
+
+        return mapper.toResponseDto(user);
     }
 
     @Override
