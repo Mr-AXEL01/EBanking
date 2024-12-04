@@ -21,7 +21,7 @@ public class AppRole implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String roleName;
+    private String name;
 
     public AppRole(String roleUser) {
     }
