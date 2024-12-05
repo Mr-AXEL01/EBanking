@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/public")
 
 @RequiredArgsConstructor
-public class RegisterController {
+public class PublicController {
 
     private final UserService service;
 
