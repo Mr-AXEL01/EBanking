@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true, fluent = true)
+@Accessors(chain = true)
 public class AppRole implements Serializable {
 
     @Id

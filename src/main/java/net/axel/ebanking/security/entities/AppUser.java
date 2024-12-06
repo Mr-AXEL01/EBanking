@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true, fluent = true)
+@Accessors(chain = true)
 public class AppUser implements Serializable {
 
     @Id
@@ -28,11 +28,4 @@ public class AppUser implements Serializable {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private AppRole role;
-
-    @PrePersist
-    public void assignDefaultRole() {
-        if (this.role == null) {
-            this.role = new AppRole("ROLE_USER");
-        }
-    }
 }
