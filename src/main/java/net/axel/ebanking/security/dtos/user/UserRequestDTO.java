@@ -6,6 +6,8 @@ public record UserRequestDTO(
 
         @NotBlank String username,
 
-        @NotBlank String password
+        @NotBlank String password,
+
+        @NotBlank String passwordConfirmation
 ) {
 }
