@@ -2,13 +2,14 @@ package net.axel.ebanking.security.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import net.axel.ebanking.security.dtos.user.UserRequestDTO;
 import net.axel.ebanking.security.dtos.user.UserResponseDTO;
 import net.axel.ebanking.security.dtos.user.UserUpdatePasswordDTO;
 import net.axel.ebanking.security.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(UserController.CONTROLLER_PATH)
