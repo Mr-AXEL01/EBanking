@@ -5,6 +5,7 @@ import net.axel.ebanking.security.dtos.role.RoleResponseDTO;
 import net.axel.ebanking.security.dtos.user.UserRequestDTO;
 import net.axel.ebanking.security.dtos.user.UserResponseDTO;
 import net.axel.ebanking.security.dtos.user.UserUpdatePasswordDTO;
+import net.axel.ebanking.security.entities.AppUser;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface UserService {
     UserResponseDTO createUser(UserRequestDTO dto);
 
     UserResponseDTO findUser(String username);
+
+    AppUser findUserEntity(String username);
 
     UserResponseDTO updateUserRole(String username, RoleRequestDTO dto);
 
