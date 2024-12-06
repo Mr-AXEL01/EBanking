@@ -38,11 +38,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO createUser(UserRequestDTO dto) {
+        if (!dto.passwordConfirmation().equals(dto.password())) {
+            throw new BadCredentialsException("Passwords do not match.");
+        }
+
+        AppRole role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("Role not found or duplicated in the database"));
+
         AppUser user = mapper.toEntity(dto)
-                .password(passwordEncoder.encode(
-                        dto.password()
-                ));
-        
+                .setPassword(passwordEncoder.encode(dto.password()))
+                .setRole(role);
+
         AppUser savedUser = repository.save(user);
 
         return mapper.toResponseDto(savedUser);
@@ -55,6 +61,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
     }
 
+    public AppUser findUserEntity(String username) {
+        return repository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
+    }
+
     @Override
     public UserResponseDTO updateUserRole(String username, RoleRequestDTO dto) {
         AppRole role = roleRepository.findByName(dto.name())
@@ -63,12 +74,12 @@ public class UserServiceImpl implements UserService {
         AppUser user = repository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
 
-        if (user.role().equals(role)) {
+        if (user.getRole().equals(role)) {
             throw new RuntimeException("Role already assigned!");
         }
 
         return mapper.toResponseDto(
-                user.role(role)
+                user.setRole(role)
         );
     }
 
@@ -97,15 +108,15 @@ public class UserServiceImpl implements UserService {
         AppUser user = repository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with the username provided :" + username));
 
-        if (!passwordEncoder.matches(dto.currentPassword(), user.password())) {
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
             throw new BadCredentialsException("Current password is incorrect.");
         }
 
-        if (passwordEncoder.matches(dto.newPassword(), user.password())) {
+        if (passwordEncoder.matches(dto.newPassword(), user.getPassword())) {
             throw new BusinessException("The new password can't be the same as the current one.");
         }
 
-        user.password(passwordEncoder.encode(dto.newPassword()));
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
 
         return mapper.toResponseDto(user);
     }
