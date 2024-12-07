@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.axel.ebanking.exception.domain.BadCredentialsException;
 import net.axel.ebanking.exception.domain.BusinessException;
 import net.axel.ebanking.exception.domain.ResourceNotFoundException;
+import net.axel.ebanking.exception.domain.UsernameAlreadyExistsException;
 import net.axel.ebanking.security.dtos.role.RoleRequestDTO;
 import net.axel.ebanking.security.dtos.role.RoleResponseDTO;
 import net.axel.ebanking.security.dtos.user.UserRequestDTO;
@@ -42,8 +43,12 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Passwords do not match.");
         }
 
+        if (repository.existsByUsername(dto.username())) {
+            throw new UsernameAlreadyExistsException(dto.username());
+        }
+
         AppRole role = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Role not found or duplicated in the database"));
+                .orElseThrow(() -> new ResourceNotFoundException("Need Role in DB."));
 
         AppUser user = mapper.toEntity(dto)
                 .setPassword(passwordEncoder.encode(dto.password()))
@@ -58,24 +63,24 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO findUser(String username) {
         return repository.findByUsername(username)
                 .map(mapper::toResponseDto)
-                .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
+                .orElseThrow(() -> new ResourceNotFoundException("No User found with the given username" + username));
     }
 
     public AppUser findUserEntity(String username) {
         return repository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
+                .orElseThrow(() -> new ResourceNotFoundException("No User found with the given username" + username));
     }
 
     @Override
     public UserResponseDTO updateUserRole(String username, RoleRequestDTO dto) {
         AppRole role = roleRepository.findByName(dto.name())
-                .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
+                .orElseThrow(() -> new ResourceNotFoundException("No Role found with the given role : " + dto.name()));
 
         AppUser user = repository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("No User found with the given username" + username));
+                .orElseThrow(() -> new ResourceNotFoundException("No User found with the given username : " + username));
 
         if (user.getRole().equals(role)) {
-            throw new RuntimeException("Role already assigned!");
+            throw new BusinessException("Role already assigned!");
         }
 
         return mapper.toResponseDto(
@@ -86,7 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String username) {
         if (!repository.existsByUsername(username)) {
-            throw new RuntimeException("Non exists User.");
+            throw new ResourceNotFoundException("Non exists User.");
         }
 
         UserResponseDTO user = findUser(username);
