@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.axel.ebanking.security.entities.AppUser;
 import net.axel.ebanking.security.providers.CustomAuthenticationProvider;
 import net.axel.ebanking.security.service.UserService;
+import net.axel.ebanking.security.utils.CustomAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,8 @@ import java.util.List;
 public class securityConfig {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -48,6 +51,9 @@ public class securityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .httpBasic(Customizer.withDefaults())
                 .userDetailsService(userDetailsService());
