@@ -22,5 +22,20 @@ public class PublicController {
         UserResponseDTO user = service.createUser(dto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
+
+    @GetMapping("/notices")
+    public ResponseEntity<String> getNotices() {
+        return ResponseEntity.ok("EBank wish you happy new Year 2025.");
+    }
+
+    @GetMapping("/contact")
+    public ResponseEntity<String> getContact() {
+        return ResponseEntity.ok(
+                """
+                        EBank support at your service:
+                        Email: Support@ebank.ma
+                        Phone: +212666666666"""
+        );
+    }
 }
 
